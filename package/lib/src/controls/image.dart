@@ -39,9 +39,10 @@ class ImageControl extends StatelessWidget {
 
     var src = control.attrString("src", "")!;
     var srcBase64 = control.attrString("srcBase64", "")!;
-    if (src == "" && srcBase64 == "") {
+    var srcUtf8 = control.attrString("srcUtf8", "")!;
+    if (src == "" && srcBase64 == "" && srcUtf8 == "") {
       return const ErrorControl(
-          "Image must have either \"src\" or \"src_base64\" specified.");
+          "Image must have either \"src\" or \"src_base64\" or \"src_utf_8\" specified.");
     }
     double? width = control.attrDouble("width", null);
     double? height = control.attrDouble("height", null);
@@ -93,7 +94,37 @@ class ImageControl extends StatelessWidget {
             } catch (ex) {
               return ErrorControl("Error decoding base64: ${ex.toString()}");
             }
-          } else if (src.contains(svgTag)) {
+          } else if (srcUtf8 != "") {
+            try {
+              Uint8List bytes = Uint8List.fromList(utf8.encode(srcUtf8));
+              if (arrayIndexOf(
+                      bytes, Uint8List.fromList(utf8.encode(svgTag))) !=
+                  -1) {
+                image = SvgPicture.memory(bytes,
+                    width: width,
+                    height: height,
+                    fit: fit ?? BoxFit.contain,
+                    colorFilter: color != null
+                        ? ColorFilter.mode(
+                            color, colorBlendMode ?? BlendMode.srcIn)
+                        : null,
+                    semanticsLabel: semanticsLabel);
+              } else {
+                image = Image.memory(bytes,
+                    width: width,
+                    height: height,
+                    repeat: repeat,
+                    fit: fit,
+                    color: color,
+                    colorBlendMode: colorBlendMode,
+                    gaplessPlayback: gaplessPlayback ?? true,
+                    semanticLabel: semanticsLabel);
+              }
+            } catch (ex) {
+              return ErrorControl("Error decoding utf8: ${ex.toString()}");
+            }
+          }
+          else if (src.contains(svgTag)) {
             image = SvgPicture.memory(Uint8List.fromList(utf8.encode(src)),
                 width: width,
                 height: height,

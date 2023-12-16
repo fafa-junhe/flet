@@ -85,6 +85,7 @@ class Image(ConstrainedControl):
         # Specific
         #
         src_base64: Optional[str] = None,
+        src_utf_8: Optional[str] = None,
         error_content: Optional[Control] = None,
         repeat: Optional[ImageRepeat] = None,
         fit: Optional[ImageFit] = None,
@@ -126,6 +127,7 @@ class Image(ConstrainedControl):
 
         self.src = src
         self.src_base64 = src_base64
+        self.src_utf_8 = src_utf_8
         self.error_content = error_content
         self.fit = fit
         self.repeat = repeat
@@ -166,6 +168,15 @@ class Image(ConstrainedControl):
     @src_base64.setter
     def src_base64(self, value):
         self._set_attr("srcBase64", value)
+
+    # src_utf_8
+    @property
+    def src_utf_8(self):
+        return self._get_attr("srcUtf8")
+
+    @src_utf_8.setter
+    def src_utf_8(self, value):
+        self._set_attr("srcUtf8", value)
 
     # fit
     @property
